@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block style %}
+.error {
+  margin-top: 3rem;
+  text-align: center;
+  font-size: larger;
+}
+{% endblock %}
+{% block main %}
+      <section>
+        <p class="error">{{ detail }}</p>
+      </section>
+{% endblock %}

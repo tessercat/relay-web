@@ -1,8 +1,8 @@
-""" The relay settings module. """
+""" The relay env module. """
 import fnmatch
 import os
 import logging
-from jinja2 import Environment, FileSystemLoader
+from starlette.templating import Jinja2Templates
 
 
 # Basics
@@ -13,14 +13,12 @@ logger = logging.getLogger("uvicorn.error")
 
 # Templates
 
-templates = {}
-env = Environment(
-    loader=FileSystemLoader("templates"),
-    autoescape=True
+templates = Jinja2Templates(
+    directory='templates',
+    trim_blocks=True,
+    lstrip_blocks=True
 )
-for tpl in env.list_templates():
-    templates[tpl] = env.get_template(tpl)
-logger.info("Loaded templates %s", templates)
+logger.info("Loaded templates %s", templates.env.list_templates())
 
 
 # Scripts
@@ -43,8 +41,8 @@ scripts['adapter'] = get_adapter()
 
 def get_client():
     """ Return the client filename. """
-    js_dir = os.path.join(base_dir, "static", "js")
-    for script in os.listdir(js_dir):
+    script_dir = os.path.join(base_dir, "static", "js")
+    for script in os.listdir(script_dir):
         if fnmatch.fnmatch(script, "relay-client-*.js"):
             logger.info("Found client %s", script)
             return script
