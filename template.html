@@ -1,0 +1,39 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Call Peter</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/img/a/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/img/a/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/img/a/favicon-16x16.png">
+    <link rel="manifest" href="{% static '/static/img/a/site.webmanifest">
+    <link rel="mask-icon" href="{% static '/static/img/a/safari-pinned-tab.svg" color="#6ab0f3">
+    <link rel="shortcut icon" href="{% static '/static/img/a/favicon.ico">
+    <meta name="msapplication-TileColor" content="#2b5797">
+    <meta name="msapplication-config" content="/static/img/a/browserconfig.xml">
+    <meta name="theme-color" content="#6ab0f3">
+    <style>
+    </style>
+  </head>
+  <body>
+    <main>
+      <noscript>
+        <p class="noscript">Enable JavaScript</p>
+      </noscript>
+      <script src="/static/js/adapter-8.1.1.js"></script>
+      <script src="/static/js/relay-client-0.0.1.js"></script>
+      <script>
+        const client = new RelayClient();
+        client.call("$callee");
+      </script>
+      <section>
+        <audio id="audio"></audio>
+      </section>
+      <section>
+        <p id="call-status">Connecting</p>
+        <button id="hangup-button">Hang up</button>
+      </section>
+    </main>
+  </body>
+</html>
