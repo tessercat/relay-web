@@ -11,10 +11,10 @@ async def verto(request):
     callee = request.query_params.get("callee")
     if not callee:
         raise HTTPException(400, detail="Missing callee")
-    html = settings.templates['verto'].substitute({
+    html = settings.templates['verto.html'].render({
         "callee": callee,
-        "adapter": settings.versions['adapter'],
-        "client": settings.versions['client']
+        "adapter": settings.scripts['adapter'],
+        "client": settings.scripts['client']
     })
     return HTMLResponse(html)
 

@@ -1,4 +1,5 @@
 starlette
 uvicorn
+Jinja2
 flake8
 pylint

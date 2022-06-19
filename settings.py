@@ -2,46 +2,53 @@
 import fnmatch
 import os
 import logging
-from string import Template
+from jinja2 import Environment, FileSystemLoader
 
+
+# Basics
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 logger = logging.getLogger("uvicorn.error")
+
+
+# Templates
+
 templates = {}
-versions = {}
+env = Environment(
+    loader=FileSystemLoader("templates"),
+    autoescape=True
+)
+for tpl in env.list_templates():
+    templates[tpl] = env.get_template(tpl)
+logger.info("Loaded templates %s", templates)
 
 
-def get_verto_template():
-    """ Return the verto template """
-    tpl_path = os.path.join(base_dir, "html", "verto.html")
-    with open(tpl_path, encoding="utf-8") as tpl_fd:
-        return Template(tpl_fd.read())
+# Scripts
+
+scripts = {}
 
 
-templates['verto'] = get_verto_template()
-
-
-def get_adapter_version():
+def get_adapter():
     """ Return the adapter filename. """
-    js_dir = os.path.join(base_dir, "static", "js")
-    for script in os.listdir(js_dir):
+    script_dir = os.path.join(base_dir, "static", "js")
+    for script in os.listdir(script_dir):
         if fnmatch.fnmatch(script, "adapter-*.js"):
-            logger.info("Found %s", script)
+            logger.info("Found adapter %s", script)
             return script
     raise ValueError("No adapter")
 
 
-versions['adapter'] = get_adapter_version()
+scripts['adapter'] = get_adapter()
 
 
-def get_client_version():
+def get_client():
     """ Return the client filename. """
     js_dir = os.path.join(base_dir, "static", "js")
     for script in os.listdir(js_dir):
         if fnmatch.fnmatch(script, "relay-client-*.js"):
-            logger.info("Found %s", script)
+            logger.info("Found client %s", script)
             return script
     raise ValueError("No client")
 
 
-versions['client'] = get_client_version()
+scripts['client'] = get_client()

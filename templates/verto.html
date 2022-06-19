@@ -21,11 +21,11 @@
       <noscript>
         <p class="noscript">Enable JavaScript</p>
       </noscript>
-      <script src="/static/js/$adapter"></script>
-      <script src="/static/js/$client"></script>
+      <script src="/static/js/{{ adapter }}"></script>
+      <script src="/static/js/{{ client }}"></script>
       <script>
         const client = new RelayClient();
-        client.call("$callee");
+        client.call("{{ callee }}");
       </script>
       <section>
         <audio id="audio"></audio>
