@@ -1,0 +1,24 @@
+{
+  "name": "relay-client",
+  "version": "0.0.1",
+  "description": "Verto relay client",
+  "main": "",
+  "scripts": {
+    "prebuild": "rm -f ../static/js/relay-client-*.js",
+    "build": "esbuild src/relay-client.js --bundle --entry-names=[dir]/[name]-[hash] --outdir=../static/js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tessercat/relay-web.git"
+  },
+  "author": "Peter Christensen",
+  "license": "CC-BY-NC-SA-4.0",
+  "bugs": {
+    "url": "https://github.com/tessercat/relay-web/issues"
+  },
+  "homepage": "https://github.com/tessercat/relay-web#readme",
+  "devDependencies": {
+    "esbuild": "^0.14.46"
+  }
+}

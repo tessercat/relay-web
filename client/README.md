@@ -8,7 +8,7 @@ WebSocket client.
 ## nvm
 
 [Install nvm](https://github.com/nvm-sh/nvm#install--update-script)
-into the `pbx-web` shell account.
+in the `relay` shell account.
 
 Check the lastest version and:
 
