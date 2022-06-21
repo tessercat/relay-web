@@ -43,7 +43,7 @@ def get_client():
     """ Return the client filename. """
     script_dir = os.path.join(base_dir, "static", "js")
     for script in os.listdir(script_dir):
-        if fnmatch.fnmatch(script, "relay-client-*.js"):
+        if fnmatch.fnmatch(script, "client-*.js"):
             logger.info("Found client %s", script)
             return script
     raise ValueError("No client")

@@ -2,10 +2,10 @@
   "name": "relay-client",
   "version": "0.0.1",
   "description": "Verto relay client",
-  "main": "client.js",
+  "main": "",
   "scripts": {
     "prebuild": "rm -f ../static/js/relay-client-*.js",
-    "build": "esbuild src/client.js --bundle --entry-names=[dir]/[name]-[hash] --outdir=../static/js",
+    "build": "esbuild src/relay-client.js --bundle --entry-names=[dir]/[name]-[hash] --outdir=../static/js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -19,7 +19,6 @@
   },
   "homepage": "https://github.com/tessercat/relay-web#readme",
   "devDependencies": {
-    "esbuild": "^0.14.46",
-    "eslint": "^8.18.0"
+    "esbuild": "^0.14.46"
   }
 }

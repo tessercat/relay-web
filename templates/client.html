@@ -7,7 +7,7 @@
       <script src="/static/js/{{ client }}"></script>
       <script>
         const client = new RelayClient();
-        client.call("{{ callee }}");
+        client.start();
       </script>
       <section>
         <audio id="audio"></audio>

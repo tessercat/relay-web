@@ -8,23 +8,22 @@ import env
 
 # Routes
 
-async def verto(request):
-    """ Render the verto call page. """
+async def client(request):
+    """ Render the client page. """
     callee = request.query_params.get("callee")
     if not callee:
         raise HTTPException(400, detail="Missing callee")
     context = {
         "request": request,
         "title": f"Call {callee}",
-        "callee": callee,
         "adapter": env.scripts['adapter'],
         "client": env.scripts['client']
     }
-    return env.templates.TemplateResponse("verto.html", context)
+    return env.templates.TemplateResponse("client.html", context)
 
 
 routes = [
-    Route("/verto", verto, methods=["GET"]),
+    Route("/client", client, methods=["GET"]),
 ]
 
 
