@@ -2,7 +2,7 @@
  *  Copyright (c) 2020 Peter Christensen. All Rights Reserved.
  *  CC BY-NC-ND 4.0.
  */
-import logger from './logger.js';
+import logger from "./logger.js";
 
 class VertoSocket {
 
@@ -66,7 +66,7 @@ class VertoSocket {
       }
       if (!this.isClosed) {
         const delay = this._retryInterval();
-        logger.debug('socket', `Waiting ${delay} after ${this.retryCount} tries`);
+        logger.debug("socket", `Waiting ${delay} after ${this.retryCount} tries`);
         this.retryTimer = setTimeout(() => {
           this.retryCount += 1;
           this.open();
@@ -94,14 +94,14 @@ class VertoSocket {
     if (this.socket && this.socket.readyState === 1) {
       this.socket.send(JSON.stringify(message));
     } else {
-      throw new Error('Error sending message');
+      throw new Error("Error sending message");
     }
   }
 }
 
 class VertoRequest {
   constructor(sessionId, requestId, method, params) {
-    this.jsonrpc = '2.0';
+    this.jsonrpc = "2.0";
     this.id = requestId;
     this.method = method;
     this.params = {sessid: sessionId, ...params};
@@ -124,6 +124,7 @@ export default class VertoClient {
     this.requestExpiry = 30 * 1000;
     this.socket = null;
     this.sessionId = this.newUuid();
+    this.lastPing = null;
 
     this.onConnect = null;
     this.onDisconnect = null;
@@ -148,7 +149,7 @@ export default class VertoClient {
   newUuid() {
     const url = URL.createObjectURL(new Blob());
     URL.revokeObjectURL(url);
-    return url.split('/').pop();
+    return url.split("/").pop();
   }
 
   sendRequest(method, params, onSuccess, onError) {
@@ -161,14 +162,14 @@ export default class VertoClient {
     this.responseCallbacks[request.id] = new ResponseCallbacks(
       onSuccess, onError
     );
-    logger.debug('client', 'Request', request);
+    logger.debug("client", "Request", request);
     this.socket.send(request);
   }
 
   // Socket handlers
 
   _onSocketOpen() {
-    logger.debug('client', 'Socket open');
+    logger.debug("client", "Socket open");
     this._resetClientState();
     if (this.onConnect) {
       this.onConnect();
@@ -176,7 +177,7 @@ export default class VertoClient {
   }
 
   _onSocketClose() {
-    logger.debug('client', 'Socket closed');
+    logger.debug("client", "Socket closed");
     this._resetClientState();
     if (this.onDisconnect) {
       this.onDisconnect();
@@ -188,7 +189,7 @@ export default class VertoClient {
     try {
       message = JSON.parse(event.data);
     } catch (error) {
-      throw new Error('Message parse error');
+      throw new Error("Message parse error");
     }
     if (this.responseCallbacks[message.id]) {
       this._handleResponse(message);
@@ -199,48 +200,58 @@ export default class VertoClient {
 
   // Client state helpers
 
-  _cleanResponseCallbacks() {
-    logger.debug('client', 'Cleaning callbacks');
+  _cleanResponseCallbacks(cleanAll) {
+    logger.debug("client", "Cleaning callbacks");
     const expired = [];
     const now = new Date();
     for (const requestId in this.responseCallbacks) {
-      const diff = now - this.responseCallbacks[requestId].sent;
-      if (diff > this.requestExpiry) {
+      if (cleanAll) {
         expired.push(requestId);
+      } else {
+        const diff = now - this.responseCallbacks[requestId].sent;
+        if (diff > this.requestExpiry) {
+          expired.push(requestId);
+        }
       }
     }
     for (const requestId of expired) {
       delete this.responseCallbacks[requestId];
-      logger.error('client', 'Deleted callback', requestId);
+      logger.error("client", "Deleted callback", requestId);
     }
   }
 
   _resetClientState() {
-    this._cleanResponseCallbacks();
+    this.lastPing = null;
+    this._cleanResponseCallbacks(true);
   }
 
   // Response/event handlers
 
   _handleResponse(message) {
     if (message.result) {
-      logger.debug('client', 'Response', message);
+      logger.debug("client", "Response", message);
       const onSuccess = this.responseCallbacks[message.id].onSuccess;
       if (onSuccess) {
         onSuccess(message);
       }
     } else if (message.error) {
-      logger.error('client', 'Response error', message);
+      logger.error("client", "Response error", message);
       const onError = this.responseCallbacks[message.id].onError;
       if (onError) {
         onError(message);
       }
     } else {
-      logger.error('client', 'Response unhandled', message);
+      logger.error("client", "Response unhandled", message);
     }
     delete this.responseCallbacks[message.id];
   }
 
   _handleEvent(event) {
-    logger.debug('client', 'Event', event);
+    if (event.method === "verto.ping") {
+      this._cleanResponseCallbacks(false);
+      this.lastPing = event.params.serno;
+    } else {
+      logger.debug("client", "Event", event);
+    }
   }
 }

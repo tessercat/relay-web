@@ -4,7 +4,7 @@
   "description": "Verto relay client",
   "main": "client.js",
   "scripts": {
-    "prebuild": "rm -f ../static/js/relay-client-*.js",
+    "prebuild": "rm -f ../static/js/client-*.js",
     "build": "esbuild src/client.js --bundle --entry-names=[dir]/[name]-[hash] --outdir=../static/js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
