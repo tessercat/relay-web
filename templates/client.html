@@ -4,8 +4,8 @@
         <p class="noscript">Enable JavaScript</p>
       </noscript>
       <script src="/static/js/{{ adapter }}"></script>
-      <script src="/static/js/{{ client }}"></script>
-      <script>
+      <script type="module">
+        import { RelayClient } from "/static/js/{{ client }}";
         const client = new RelayClient();
         window.addEventListener("beforeunload", function (event) {
           client.stop();

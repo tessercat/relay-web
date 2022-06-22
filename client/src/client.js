@@ -95,4 +95,4 @@ class RelayClient {
   }
 }
 
-window.RelayClient = RelayClient;
+export { RelayClient };
