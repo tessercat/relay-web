@@ -1,24 +1,21 @@
-/*
- *  Copyright (c) 2020 Peter Christensen. All Rights Reserved.
- *  CC BY-NC-ND 4.0.
- */
 function _getPrefix(prefix) {
   return `[${prefix} ${new Date().toLocaleTimeString()}]`;
 }
 
 let logger = {
-  debug: (prefix, ...args) => {
+  debug: (caller, ...args) => {
     if (document.debugLogEnabled) {
-      console.debug(_getPrefix(prefix), ...args);
+      console.debug(_getPrefix(caller.constructor.name), ...args);
     }
   },
-  info: (prefix, ...args) => {
+  info: (caller, ...args) => {
     if (document.infoLogEnabled) {
-      console.log(_getPrefix(prefix), ...args);
+      console.log(_getPrefix(caller.constructor.name), ...args);
     }
   },
-  error: (prefix, ...args) => {
-    console.error(_getPrefix(prefix), ...args);
+  error: (caller, ...args) => {
+    console.error(_getPrefix(caller.constructor.name), ...args);
   }
 }
-export default logger;
+
+export { logger };

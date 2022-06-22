@@ -7,6 +7,11 @@
       <script src="/static/js/{{ client }}"></script>
       <script>
         const client = new RelayClient();
+        window.addEventListener("beforeunload", function (event) {
+          client.stop();
+        });
+        document.debugLogEnabled = true;
+        document.infoLogEnabled = true;
         client.start();
       </script>
       <section>

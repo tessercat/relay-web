@@ -15,7 +15,7 @@ async def client(request):
         raise HTTPException(400, detail="Missing callee")
     context = {
         "request": request,
-        "title": f"Call {callee}",
+        "title": f"{callee}",
         "adapter": env.scripts['adapter'],
         "client": env.scripts['client']
     }

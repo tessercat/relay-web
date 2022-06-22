@@ -1,8 +1,4 @@
-/*
- *  Copyright (c) 2020 Peter Christensen. All Rights Reserved.
- *  CC BY-NC-ND 4.0.
- */
-import logger from "./logger.js";
+import { logger } from "./logger.js";
 
 class VertoSocket {
 
@@ -10,7 +6,7 @@ class VertoSocket {
     this.wssUrl = wssUrl;
     this.socket = null;
     this.isOpening = false;
-    this.isClosed = true;
+    this.isClosing = false;
     this.retryCount = 0;
     this.retryBackoff = 5 * 1000;
     this.retryMaxWait = 30 * 1000;
@@ -45,7 +41,7 @@ class VertoSocket {
       return;
     }
     this.isOpening = true;
-    this.isClosed = false;
+    this.isClosing = false;
     clearTimeout(this.retryTimer);
     const socket = new WebSocket(this.wssUrl);
     socket.onopen = () => {
@@ -64,9 +60,9 @@ class VertoSocket {
       if (this.onClose) {
         this.onClose();
       }
-      if (!this.isClosed) {
+      if (!this.isClosing) {
         const delay = this._retryInterval();
-        logger.debug("socket", `Waiting ${delay} after ${this.retryCount} tries`);
+        logger.info(this, `Waiting ${delay} after ${this.retryCount} tries`);
         this.retryTimer = setTimeout(() => {
           this.retryCount += 1;
           this.open();
@@ -81,7 +77,7 @@ class VertoSocket {
   }
 
   close() {
-    this.isClosed = true;
+    this.isClosing = true;
     this.isOpening = false;
     clearTimeout(this.retryTimer);
     this.retryCount = 0;
@@ -116,7 +112,7 @@ class ResponseCallbacks {
   }
 }
 
-export default class VertoClient {
+class VertoClient {
 
   constructor(wssUrl) {
     this.wssUrl = wssUrl;
@@ -128,6 +124,7 @@ export default class VertoClient {
 
     this.onConnect = null;
     this.onDisconnect = null;
+    this.onEvent = null;
   }
 
   connect() {
@@ -143,6 +140,7 @@ export default class VertoClient {
   disconnect() {
     if (this.socket) {
       this.socket.close();
+      this.socket = null;
     }
   }
 
@@ -162,14 +160,14 @@ export default class VertoClient {
     this.responseCallbacks[request.id] = new ResponseCallbacks(
       onSuccess, onError
     );
-    logger.debug("client", "Request", request);
+    logger.debug(this, "Request", request);
     this.socket.send(request);
   }
 
   // Socket handlers
 
   _onSocketOpen() {
-    logger.debug("client", "Socket open");
+    logger.debug(this, "Socket open");
     this._resetClientState();
     if (this.onConnect) {
       this.onConnect();
@@ -177,7 +175,7 @@ export default class VertoClient {
   }
 
   _onSocketClose() {
-    logger.debug("client", "Socket closed");
+    logger.debug(this, "Socket closed");
     this._resetClientState();
     if (this.onDisconnect) {
       this.onDisconnect();
@@ -201,7 +199,7 @@ export default class VertoClient {
   // Client state helpers
 
   _cleanResponseCallbacks(cleanAll) {
-    logger.debug("client", "Cleaning callbacks");
+    logger.debug(this, "Cleaning callbacks");
     const expired = [];
     const now = new Date();
     for (const requestId in this.responseCallbacks) {
@@ -216,7 +214,7 @@ export default class VertoClient {
     }
     for (const requestId of expired) {
       delete this.responseCallbacks[requestId];
-      logger.error("client", "Deleted callback", requestId);
+      logger.error(this, "Deleted callback", requestId);
     }
   }
 
@@ -229,19 +227,19 @@ export default class VertoClient {
 
   _handleResponse(message) {
     if (message.result) {
-      logger.debug("client", "Response", message);
+      logger.debug(this, "Response", message);
       const onSuccess = this.responseCallbacks[message.id].onSuccess;
       if (onSuccess) {
         onSuccess(message);
       }
     } else if (message.error) {
-      logger.error("client", "Response error", message);
+      logger.error(this, "Response error", message);
       const onError = this.responseCallbacks[message.id].onError;
       if (onError) {
         onError(message);
       }
     } else {
-      logger.error("client", "Response unhandled", message);
+      logger.error(this, "Response unhandled", message);
     }
     delete this.responseCallbacks[message.id];
   }
@@ -250,8 +248,12 @@ export default class VertoClient {
     if (event.method === "verto.ping") {
       this._cleanResponseCallbacks(false);
       this.lastPing = event.params.serno;
+    } else if (this.onEvent) {
+      this.onEvent(event);
     } else {
-      logger.debug("client", "Event", event);
+      logger.debug(this, "Event", event);
     }
   }
 }
+
+export { VertoClient };
